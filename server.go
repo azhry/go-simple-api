@@ -17,6 +17,10 @@ func main() {
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 5,
 	}))
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
+	}))
 
 	e.GET("/", func(c echo.Context) error {
 		token := jwt.New(jwt.SigningMethodHS256)
@@ -43,6 +47,11 @@ func main() {
 			SigningKey: []byte(jwtSecretKey),
 		}))
 		user.GET("/:id", handlers.GetUser)
+	}
+
+	donation := e.Group("/donations")
+	{
+		donation.GET("/list", handlers.GetDonations)
 	}
 
 	e.Logger.Fatal(e.Start(":1323"))
